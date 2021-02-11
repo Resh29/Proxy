@@ -5,35 +5,59 @@ const arr = [
   { count: 15, name: "two" }
 ];
 
-// const some = wrap(arr);
-
 const view = {
   container: null,
+  wrapped: null,
   init(container, arr) {
     this.container = document.getElementById(container);
-    const wrapped = arr.map((el) => {
-      return (el.setValue = (value) => {
-        this.count = value;
-      });
-    });
-    return this.wrap(wrapped);
+    this.wrapped = this.wrap(arr);
+
+    this.render(this.wrapped);
   },
   wrap(arr) {
     return arr.map((object) => {
       return new Proxy(object, {
-        set(target, prop, value) {
-          console.log(`Hi, my name is ${value}`);
-          return (target[prop] = value);
+        set: (target, prop, value) => {
+          target[prop] = value;
+          this.render(this.wrapped);
+          return true;
         }
       });
     });
   },
   render(items) {
-    let p = document.createElement("p");
-    p.classList.add("output");
-    for (let i = items.length - 1; i < 0; i--) {
-      p.textContent = items[i].count;
-      this.container.append(p);
+    if (this.isRender) {
+      console.log(this.isRender);
+      for (let i = 0; i < items.length; i++) {
+        let p = document.getElementById(items[i].name);
+        p.textContent = items[i].count;
+      }
+    } else {
+      for (let i = 0; i < items.length; i++) {
+        let p = document.createElement("p");
+        p.classList.add("output");
+        p.setAttribute("id", items[i].name);
+        p.textContent = items[i].count;
+        this.container.append(p);
+      }
+    }
+
+    this.isRender = true;
+  },
+
+  changeHandler(name, value) {
+    if (value) {
+      this.wrapped.find((el) => el.name === name).count = parseInt(
+        value.replace(/\D/g, ""),
+        0
+      );
     }
   }
 };
+
+view.init("app", arr);
+
+const input = document.querySelector("input");
+input.addEventListener("input", (e) => {
+  view.changeHandler(e.target.name, e.target.value);
+});
