@@ -5,18 +5,13 @@ const arr = [
   { count: 15, name: "two" }
 ];
 
-// const some = wrap(arr);
-
 const view = {
   container: null,
   init(container, arr) {
     this.container = document.getElementById(container);
-    const wrapped = arr.map((el) => {
-      return (el.setValue = (value) => {
-        this.count = value;
-      });
-    });
-    return this.wrap(wrapped);
+    this.wrapped = this.wrap(arr);
+
+    this.render(this.wrapped);
   },
   wrap(arr) {
     return arr.map((object) => {
@@ -29,11 +24,16 @@ const view = {
     });
   },
   render(items) {
-    let p = document.createElement("p");
-    p.classList.add("output");
-    for (let i = items.length - 1; i < 0; i--) {
+    console.log(items);
+    for (let i = 0; i < items.length; i++) {
+      let p = document.createElement("p");
+      p.classList.add("output");
       p.textContent = items[i].count;
+      console.log(items[i]);
       this.container.append(p);
     }
-  }
+  },
+  changeHandler(value) {}
 };
+
+view.init("app", arr);
